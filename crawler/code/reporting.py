@@ -52,7 +52,7 @@ def url_report(stat, stats, file=None):
     """
     if stat.exception:
         stats.add('fail')
-        stats.add('fail_' + str(stat.exception.__class__.__name__))
+        stats.add(f'fail_{str(stat.exception.__class__.__name__)}')
         print(stat.url, 'error', stat.exception, file=file)
     elif stat.next_url:
         stats.add('redirect')
@@ -73,7 +73,7 @@ def url_report(stat, stats, file=None):
         else:
             stats.add('error')
             stats.add('error_bytes', stat.size)
-            stats.add('status_%s' % stat.status)
+            stats.add(f'status_{stat.status}')
         print(stat.url, stat.status,
               stat.content_type, stat.encoding,
               stat.size,

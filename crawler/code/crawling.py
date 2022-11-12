@@ -107,7 +107,7 @@ class Crawler:
 
         This checks for equality modulo an initial 'www.' component.
         """
-        host = host[4:] if host.startswith('www.') else 'www.' + host
+        host = host[4:] if host.startswith('www.') else f'www.{host}'
         return host in self.root_domains
 
     def _host_okay_lenient(self, host):

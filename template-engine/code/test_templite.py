@@ -33,7 +33,7 @@ class TempliteTest(TestCase):
             self.assertEqual(actual, result)
 
     def assertSynErr(self, msg):
-        pat = "^" + re.escape(msg) + "$"
+        pat = f"^{re.escape(msg)}$"
         return self.assertRaisesRegexp(TempliteSyntaxError, pat)
 
     def test_passthrough(self):

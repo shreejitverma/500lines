@@ -21,7 +21,7 @@ class Interaction(object):
         self.mouse_loc = None
         # Unsophisticated callback mechanism
         self.callbacks = defaultdict(list)
-        
+
         self.register()
 
     def register(self):
@@ -80,8 +80,6 @@ class Interaction(object):
                 self.trigger('move', x, y)
             elif self.pressed == GLUT_MIDDLE_BUTTON:
                 self.translate(dx/60.0, dy/60.0, 0)
-            else:
-                pass
             glutPostRedisplay()
         self.mouse_loc = (x, y)
 

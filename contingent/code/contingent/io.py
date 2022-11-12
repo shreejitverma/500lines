@@ -38,19 +38,17 @@ def inotify_wait_on(paths):
     fd = _libc.inotify_init()
     descriptors = {}
     if fd == -1:
-        raise OSError('inotify_init() error: {}'.format(
-            os.strerror(ctypes.get_errno())))
+        raise OSError(f'inotify_init() error: {os.strerror(ctypes.get_errno())}')
     try:
         for path in paths:
             rv = _libc.inotify_add_watch(fd, path, 0x2)
             if rv == -1:
-                raise OSError('inotify_add_watch() error: {}'.format(
-                    os.strerror(ctypes.get_errno())))
+                raise OSError(f'inotify_add_watch() error: {os.strerror(ctypes.get_errno())}')
             descriptors[rv] = path
         buf = os.read(fd, 1024)
-        # TODO: continue with some more reads with 0.1 second timeouts
-        # to empty the list of roughly-simultaneous events before
-        # closing our file descriptor and returning?
+            # TODO: continue with some more reads with 0.1 second timeouts
+            # to empty the list of roughly-simultaneous events before
+            # closing our file descriptor and returning?
     finally:
         pass #os.close(fd)
     time.sleep(0.1)  # until above TODO is done

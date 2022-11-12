@@ -46,7 +46,7 @@ class case_cgi_file(base_case):
     '''Something runnable.'''
 
     def run_cgi(self, handler):
-        cmd = "python " + handler.full_path
+        cmd = f"python {handler.full_path}"
         child_stdin, child_stdout = os.popen2(cmd)
         child_stdin.close()
         data = child_stdout.read()

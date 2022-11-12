@@ -22,12 +22,9 @@ class ConvexPoly(Shape): # a *convex* poly, in ccw order, with no repeating vert
                 min_inside = d
         return max_outside if max_outside <> -1e30 else min_inside
     def contains(self, p):
-        for plane in self.half_planes:
-            if plane.signed_distance(p) < 0:
-                return False
-        return True
+        return all(plane.signed_distance(p) >= 0 for plane in self.half_planes)
     def transform(self, xform):
-        return ConvexPoly(list(xform * v for v in self.vs), color=self.color)
+        return ConvexPoly([xform * v for v in self.vs], color=self.color)
 
 Triangle, Quad = ConvexPoly, ConvexPoly
 

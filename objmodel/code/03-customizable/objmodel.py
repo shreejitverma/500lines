@@ -85,10 +85,14 @@ class Class(Base):
         return cls in self.method_resolution_order()
 
     def _read_from_class(self, methname):
-        for cls in self.method_resolution_order():
-            if methname in cls._fields:
-                return cls._fields[methname]
-        return MISSING
+        return next(
+            (
+                cls._fields[methname]
+                for cls in self.method_resolution_order()
+                if methname in cls._fields
+            ),
+            MISSING,
+        )
 
 
 # set up the base hierarchy like in Python (the ObjVLisp model)

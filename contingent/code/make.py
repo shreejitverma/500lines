@@ -88,7 +88,7 @@ def chapter_doctests(path):
 def render(path):
     if path.endswith('.dot'):
         read_text_file(path)
-        png = path[:-3] + 'png'
+        png = f'{path[:-3]}png'
         subprocess.call(['dot', '-Tpng', '-o', png, path])
     elif path.endswith('.rst'):
         read_text_file(path)

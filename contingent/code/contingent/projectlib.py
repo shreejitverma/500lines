@@ -35,12 +35,11 @@ class Project:
 
         """
         text = '\n'.join(
-            '{}{} {}'.format(
-                '. ' * depth,
-                'calling' if not_available else 'returning cached',
-                task)
+            f"{'. ' * depth}{'calling' if not_available else 'returning cached'} {task}"
             for (depth, not_available, task) in self._trace
-            if verbose or not_available)
+            if verbose or not_available
+        )
+
 
         self._trace = None
         return text
@@ -200,13 +199,14 @@ class Task(namedtuple('Task', ('task_function', 'args'))):
         try:
             hash(args)
         except TypeError as e:
-            raise ValueError('arguments to project tasks must be immutable'
-                             ' and hashable, not the {}'.format(e))
+            raise ValueError(
+                f'arguments to project tasks must be immutable and hashable, not the {e}'
+            )
+
 
         return super().__new__(cls, task_function, args)
 
     def __repr__(self):
         "Produce a “syntactic,” source-like representation of the task."
 
-        return '{}({})'.format(self.task_function.__name__,
-                               ', '.join(repr(arg) for arg in self.args))
+        return f"{self.task_function.__name__}({', '.join(repr(arg) for arg in self.args)})"
