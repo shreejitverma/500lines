@@ -14,7 +14,7 @@ from sklearn.cross_validation import train_test_split
 
 def test(data_matrix, data_labels, test_indices, nn):
     avg_sum = 0
-    for j in xrange(100):
+    for _ in xrange(100):
         correct_guess_count = 0
         for i in test_indices:
             test = data_matrix[i]

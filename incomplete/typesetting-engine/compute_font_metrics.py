@@ -7,7 +7,7 @@ character_width = {}
 with open('output.txt') as f:
     for line in f:
         m = re.match(' +[0-9]+ +([0-9a-f]+) +[a-zA-Z]+ +([0-9]+)', line)
-        if m and chr(int(m.group(1), 16)) in characters:
-            character_width[chr(int(m.group(1), 16))] = int(m.group(2))
+        if m and chr(int(m[1], 16)) in characters:
+            character_width[chr(int(m[1], 16))] = int(m[2])
 with open('character_width.json', 'w') as f:
     f.write(json.dumps(character_width))

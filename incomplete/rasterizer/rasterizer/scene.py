@@ -18,7 +18,6 @@ class Scene(SceneObject):
         this_xform = xform * self.transform
         for node in self.nodes:
             if isinstance(node, Scene):
-                for n in node.traverse(this_xform):
-                    yield n
+                yield from node.traverse(this_xform)
             elif isinstance(node, Shape):
                 yield node.transform(this_xform)

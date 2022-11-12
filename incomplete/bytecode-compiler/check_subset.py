@@ -169,16 +169,14 @@ class Checker(ast.NodeVisitor):
     def visit_Attribute(self, t):
         self(t.value)
         self.check_identifier(t.attr)
-        if   isinstance(t.ctx, ast.Load):  pass
-        elif isinstance(t.ctx, ast.Store): pass
-        else: assert False
+        if isinstance(t.ctx, ast.Load):  pass
+        elif not isinstance(t.ctx, ast.Store): assert False
 
     def visit_Subscript(self, t):
         self(t.value)
         if isinstance(t.slice, ast.Index):
-            if   isinstance(t.ctx, ast.Load):  pass
-            elif isinstance(t.ctx, ast.Store): pass
-            else: assert False
+            if isinstance(t.ctx, ast.Load):  pass
+            elif not isinstance(t.ctx, ast.Store): assert False
             self(t.slice.value)
         else:
             assert False
@@ -188,16 +186,14 @@ class Checker(ast.NodeVisitor):
 
     def visit_Name(self, t):
         self.check_identifier(t.id)
-        if   isinstance(t.ctx, ast.Load):  pass
-        elif isinstance(t.ctx, ast.Store): pass
-        else: assert False
+        if isinstance(t.ctx, ast.Load):  pass
+        elif not isinstance(t.ctx, ast.Store): assert False
 
     def visit_sequence(self, t):
         self(t.elts)
         # XXX make sure there are no stars in elts
-        if   isinstance(t.ctx, ast.Load):  pass
-        elif isinstance(t.ctx, ast.Store): pass
-        else: assert False
+        if isinstance(t.ctx, ast.Load):  pass
+        elif not isinstance(t.ctx, ast.Store): assert False
 
     visit_List = visit_sequence
     visit_Tuple = visit_sequence

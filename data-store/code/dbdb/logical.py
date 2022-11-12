@@ -68,8 +68,4 @@ class LogicalBase(object):
     def __len__(self):
         if not self._storage.locked:
             self._refresh_tree_ref()
-        root = self._follow(self._tree_ref)
-        if root:
-            return root.length
-        else:
-            return 0
+        return root.length if (root := self._follow(self._tree_ref)) else 0

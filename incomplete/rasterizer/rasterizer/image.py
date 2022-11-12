@@ -5,10 +5,8 @@ class PPMImage:
     def __init__(self, resolution, bg=Color()):
         self.resolution = resolution
         self.pixels = []
-        for i in xrange(self.resolution):
-            lst = []
-            for j in xrange(self.resolution):
-                lst.append(Color(rgb=bg.rgb, a=bg.a))
+        for _ in xrange(self.resolution):
+            lst = [Color(rgb=bg.rgb, a=bg.a) for _ in xrange(self.resolution)]
             self.pixels.append(lst)
     def bounds(self):
         return AABox(Vector(0,0), Vector(1,1))

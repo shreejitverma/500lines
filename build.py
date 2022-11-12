@@ -205,10 +205,7 @@ def build_html(chapter_markdowns):
 
 def getbasename(chapter_markdown):
     import os
-    basename = os.path.splitext(
-        os.path.split(chapter_markdown)[1]
-    )[0]
-    return basename
+    return os.path.splitext(os.path.split(chapter_markdown)[1])[0]
 
 
 def _pandoc_cmd(chapter_markdown):
@@ -216,8 +213,12 @@ def _pandoc_cmd(chapter_markdown):
     # tex/md because that's where the preprocessed markdowns end up
     temp = '{pandoc} -V chaptertoken={chaptertoken} -t latex --chapters -S -f markdown+mmd_title_block+tex_math_dollars --template=tex/chaptertemplate.tex --no-highlight -o tex/{basename}.tex.1 tex/{md}'
     basename = getbasename(chapter_markdown)
-    result = temp.format(pandoc=pandoc_path, basename=basename, md=chapter_markdown, chaptertoken='s:' + basename)
-    return result
+    return temp.format(
+        pandoc=pandoc_path,
+        basename=basename,
+        md=chapter_markdown,
+        chaptertoken=f's:{basename}',
+    )
 
 
 def preprocessor_command(chapter_markdown):

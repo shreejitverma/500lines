@@ -30,9 +30,8 @@ def selected_lines(lines, first=None, after=None, numlines=None, numblanks=None)
     ready = after is None
     including = False
     for line in lines:
-        if not ready:
-            if after in line:
-                ready = True
+        if not ready and after in line:
+            ready = True
         if ready and first is not None and first in line:
             including = True
         if including:

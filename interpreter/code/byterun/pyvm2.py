@@ -53,11 +53,7 @@ class Frame(object):
 
     def unwind_block(self, block):
         """Unwind the values on the data stack when a given block is finished."""
-        if block.type == 'except-handler':
-            offset = 3
-        else:
-            offset = 0
-
+        offset = 3 if block.type == 'except-handler' else 0
         while len(self.stack) > block.stack_height + offset:
             self.pop()
 
@@ -143,10 +139,7 @@ class VirtualMachine(object):
 
     def pop_frame(self):
         self.frames.pop()
-        if self.frames:
-            self.frame = self.frames[-1]
-        else:
-            self.frame = None
+        self.frame = self.frames[-1] if self.frames else None
 
     # Jumping through bytecode
     def jump(self, jump):
@@ -201,16 +194,14 @@ class VirtualMachine(object):
         # we need to keep track of why we are doing it.
         why = None
         try:
-            bytecode_fn = getattr(self, 'byte_%s' % byte_name, None)
+            bytecode_fn = getattr(self, f'byte_{byte_name}', None)
             if bytecode_fn is None:
                 if byte_name.startswith('UNARY_'):
                     self.unaryOperator(byte_name[6:])
                 elif byte_name.startswith('BINARY_'):
                     self.binaryOperator(byte_name[7:])
                 else:
-                    raise VirtualMachineError(
-                        "unsupported bytecode type: %s" % byte_name
-                    )
+                    raise VirtualMachineError(f"unsupported bytecode type: {byte_name}")
             else:
                 why = bytecode_fn(*argument)
         except:
@@ -448,8 +439,7 @@ class VirtualMachine(object):
         self.jump(jump)
 
     def byte_POP_JUMP_IF_TRUE(self, jump):
-        val = self.frame.pop()
-        if val:
+        if val := self.frame.pop():
             self.jump(jump)
 
     def byte_POP_JUMP_IF_FALSE(self, jump):
@@ -458,18 +448,16 @@ class VirtualMachine(object):
             self.jump(jump)
 
     def byte_JUMP_IF_TRUE_OR_POP(self, jump):
-        val = self.frame.top()
-        if val:
+        if val := self.frame.top():
             self.jump(jump)
         else:
             self.frame.pop()
 
     def byte_JUMP_IF_FALSE_OR_POP(self, jump):
-        val = self.frame.top()
-        if not val:
-            self.jump(jump)
-        else:
+        if val := self.frame.top():
             self.frame.pop()
+        else:
+            self.jump(jump)
 
     ## Blocks
 
