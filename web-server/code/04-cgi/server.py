@@ -154,7 +154,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.handle_error(msg)
 
     def run_cgi(self, full_path):
-        cmd = "python " + full_path
+        cmd = f"python {full_path}"
         child_stdin, child_stdout = os.popen2(cmd)
         child_stdin.close()
         data = child_stdout.read()

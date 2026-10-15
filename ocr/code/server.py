@@ -21,11 +21,11 @@ data_labels = data_labels.tolist()
 nn = OCRNeuralNetwork(HIDDEN_NODE_COUNT, data_matrix, data_labels, list(range(5000)));
 
 class JSONHandler(BaseHTTPServer.BaseHTTPRequestHandler):
-    def do_POST(s):
+    def do_POST(self):
         response_code = 200
         response = ""
-        var_len = int(s.headers.get('Content-Length'))
-        content = s.rfile.read(var_len);
+        var_len = int(self.headers.get('Content-Length'))
+        content = self.rfile.read(var_len);
         payload = json.loads(content);
 
         if payload.get('train'):
@@ -39,12 +39,12 @@ class JSONHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         else:
             response_code = 400
 
-        s.send_response(response_code)
-        s.send_header("Content-type", "application/json")
-        s.send_header("Access-Control-Allow-Origin", "*")
-        s.end_headers()
+        self.send_response(response_code)
+        self.send_header("Content-type", "application/json")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
         if response:
-            s.wfile.write(json.dumps(response))
+            self.wfile.write(json.dumps(response))
         return
 
 if __name__ == '__main__':

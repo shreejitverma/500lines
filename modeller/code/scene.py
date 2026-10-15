@@ -10,7 +10,7 @@ class Scene(object):
 
     def __init__(self):
         # The scene keeps a list of nodes that are displayed
-        self.node_list = list()
+        self.node_list = []
         # Keep track of the currently selected node.
         # Actions may depend on whether or not something is selected
         self.selected_node = None

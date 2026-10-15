@@ -86,9 +86,8 @@ def previous_post(paths, path):
 def render(paths, path):
     previous = previous_post(paths, path)
     previous_title = 'NONE' if previous is None else title_of(previous)
-    text = '<h1>{}</h1>\n<p>Date: {}</p>\n<p>Previous post: {}</p>\n{}'.format(
-        title_of(path), date_of(path),
-        previous_title, body_of(path))
+    text = f'<h1>{title_of(path)}</h1>\n<p>Date: {date_of(path)}</p>\n<p>Previous post: {previous_title}</p>\n{body_of(path)}'
+
     print('-' * 72)
     print(text)
     return text

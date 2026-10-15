@@ -7,11 +7,8 @@ def threaded_method():
     request = 'GET /353/ HTTP/1.0\r\nHost: xkcd.com\r\n\r\n'
     sock.send(request.encode('ascii'))
     response = b''
-    chunk = sock.recv(4096)
-    while chunk:
+    while chunk := sock.recv(4096):
         response += chunk
-        chunk = sock.recv(4096)
-
     print(response)
 
 threaded_method()

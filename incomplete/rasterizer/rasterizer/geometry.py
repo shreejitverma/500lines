@@ -46,8 +46,12 @@ class AABox:
         return self.low.x <= p.x <= self.high.x and \
                self.low.y <= p.y <= self.high.y
     def overlaps(self, r):
-        return not (r.low.x >= self.high.x or r.high.x <= self.low.x or
-                    r.low.y >= self.high.y or r.high.y <= self.low.y)
+        return (
+            r.low.x < self.high.x
+            and r.high.x > self.low.x
+            and r.low.y < self.high.y
+            and r.high.y > self.low.y
+        )
     def intersection(self, other):
         return AABox(self.low.max(other.low), self.high.min(other.high))
     @staticmethod
@@ -76,7 +80,7 @@ class Transform:
             # if the other element is also a transform,
             # then return a transform corresponding to the
             # composition of the two transforms
-            t = [[0.0] * 3 for i in xrange(3)]
+            t = [[0.0] * 3 for _ in xrange(3)]
             for i, j, k in product(xrange(3), repeat=3):
                 t[i][j] += self.m[i][k] * other.m[k][j]
             return Transform(t[0][0], t[0][1], t[0][2],
@@ -88,8 +92,8 @@ class Transform:
             nx = self.m[0][0] * other.x + self.m[0][1] * other.y + self.m[0][2]
             ny = self.m[1][0] * other.x + self.m[1][1] * other.y + self.m[1][2]
             return Vector(nx, ny)
-    def det(s):
-        return s.m[0][0] * s.m[1][1] - s.m[0][1] * s.m[1][0]
+    def det(self):
+        return self.m[0][0] * self.m[1][1] - self.m[0][1] * self.m[1][0]
     def inverse(self):
         d = 1.0 / self.det()
         t = Transform(d * self.m[1][1], -d * self.m[0][1], 0,

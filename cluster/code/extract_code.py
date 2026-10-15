@@ -41,6 +41,7 @@ def code_block(filename, args):
     result = []
 
     for arg in args:
+        beginning_re = re.compile(f' *{arg}')
         beginning_re = re.compile(' *' + arg)
         for line in lines:
             if beginning_re.match(line):
@@ -51,8 +52,8 @@ def code_block(filename, args):
             print >>sys.stderr, "no match found for %r" % arg
             sys.exit(1)
 
-    space = re.match('^ *', line).group(0)
-    space_re = re.compile('^%s ' % space)
+    space = re.match('^ *', line)[0]
+    space_re = re.compile(f'^{space} ')
     whitespace = False
     for line in lines:
         if not line.strip():
@@ -67,8 +68,10 @@ def code_block(filename, args):
         lines.use_line()
 
     # left-justify with a four-space leader
-    return ['    ' + line + '\n'
-            for line in textwrap.dedent(''.join(result)).split('\n')]
+    return [
+        f'    {line}' + '\n'
+        for line in textwrap.dedent(''.join(result)).split('\n')
+    ]
 extractors['code_block'] = code_block
 
 def from_to(filename, args):
@@ -100,10 +103,10 @@ def scan_chapter():
     in_braces = False
     for line in lines:
         if in_braces:
-            if not line.startswith('}}}'):
-                continue
-            else:
+            if line.startswith('}}}'):
                 in_braces = False
+            else:
+                continue
         if not in_braces:
             result.append(line)
             if line.startswith('{{{'):

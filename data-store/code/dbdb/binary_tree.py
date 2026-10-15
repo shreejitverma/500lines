@@ -43,10 +43,7 @@ class BinaryNodeRef(ValueRef):
     def length(self):
         if self._referent is None and self._address:
             raise RuntimeError('Asking for BinaryNodeRef length of unloaded node')
-        if self._referent:
-            return self._referent.length
-        else:
-            return 0
+        return self._referent.length if self._referent else 0
 
     @staticmethod
     def referent_to_string(referent):

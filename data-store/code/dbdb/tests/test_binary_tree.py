@@ -12,11 +12,10 @@ class StubStorage(object):
         self.locked = False
 
     def lock(self):
-        if not self.locked:
-            self.locked = True
-            return True
-        else:
+        if self.locked:
             return False
+        self.locked = True
+        return True
 
     def unlock(self):
         pass

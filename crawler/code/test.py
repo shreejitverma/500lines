@@ -102,9 +102,11 @@ class TestCrawler(unittest.TestCase):
         return self.app_url + url
 
     def assertDoneCount(self, n):
-        self.assertEqual(n, len(self.crawler.done),
-                         "Expected {} URLs done, got {}".format(
-                             n, len(self.crawler.done)))
+        self.assertEqual(
+            n,
+            len(self.crawler.done),
+            f"Expected {n} URLs done, got {len(self.crawler.done)}",
+        )
 
     def assertStat(self, stat_index=0, **kwargs):
         stat = self.crawler.done[stat_index]
@@ -126,11 +128,9 @@ class TestCrawler(unittest.TestCase):
         self.add_page('/', ['/foo'])
         self.crawl()
         self.assertDoneCount(2)
-        self.assertStat(url=self.app_url + '/',
-                        num_urls=1,
-                        num_new_urls=1)
+        self.assertStat(url=f'{self.app_url}/', num_urls=1, num_new_urls=1)
 
-        self.assertStat(1, url=self.app_url + '/foo', status=404)
+        self.assertStat(1, url=f'{self.app_url}/foo', status=404)
 
     def test_link_cycle(self):
         # foo and bar link to each other.
@@ -138,14 +138,9 @@ class TestCrawler(unittest.TestCase):
         self.add_page('/bar', ['/foo'])
         self.crawl([url])
         self.assertDoneCount(2)
-        self.assertStat(url=self.app_url + '/foo',
-                        num_urls=1,
-                        num_new_urls=1)
+        self.assertStat(url=f'{self.app_url}/foo', num_urls=1, num_new_urls=1)
 
-        self.assertStat(1,
-                        url=self.app_url + '/bar',
-                        num_urls=1,
-                        num_new_urls=0)
+        self.assertStat(1, url=f'{self.app_url}/bar', num_urls=1, num_new_urls=0)
 
     def test_prohibited_host(self):
         # Link to example.com.
@@ -190,8 +185,8 @@ class TestCrawler(unittest.TestCase):
 
     def test_redirect(self):
         # "/" redirects to "/foo", and "/foo" redirects to "/bar".
-        foo = self.app_url + '/foo'
-        bar = self.app_url + '/bar'
+        foo = f'{self.app_url}/foo'
+        bar = f'{self.app_url}/bar'
 
         url = self.add_redirect('/', foo)
         self.add_redirect('/foo', bar)
@@ -208,8 +203,8 @@ class TestCrawler(unittest.TestCase):
         self.assertIn('redirect limit reached', messages)
 
     def test_redirect_cycle(self):
-        foo = self.app_url + '/foo'
-        bar = self.app_url + '/bar'
+        foo = f'{self.app_url}/foo'
+        bar = f'{self.app_url}/bar'
 
         url = self.add_redirect('/bar', foo)
         self.add_redirect('/foo', bar)
@@ -222,10 +217,10 @@ class TestCrawler(unittest.TestCase):
         # Set up redirects:
         #   foo -> baz
         #   bar -> baz -> quux
-        foo = self.app_url + '/foo'
-        bar = self.app_url + '/bar'
-        baz = self.app_url + '/baz'
-        quux = self.app_url + '/quux'
+        foo = f'{self.app_url}/foo'
+        bar = f'{self.app_url}/bar'
+        baz = f'{self.app_url}/baz'
+        quux = f'{self.app_url}/quux'
 
         self.add_redirect('/foo', baz)
         self.add_redirect('/bar', baz)
@@ -301,7 +296,7 @@ class TestCrawler(unittest.TestCase):
                 content_type = 'text/html; charset={}'.format(charset)
             else:
                 content_type = 'text/html'
-            url = '/' + charset
+            url = f'/{charset}'
             self.add_page(url, content_type=content_type)
             self.crawl([self.app_url + url])
             self.assertStat(encoding=encoding)
@@ -317,15 +312,15 @@ class TestCrawler(unittest.TestCase):
 
     def test_non_html(self):
         # Should search only XML and HTML for links, not other content types.
-        body = ('<a href="{}">'.format(self.app_url)).encode('utf-8')
+        body = f'<a href="{self.app_url}">'.encode('utf-8')
 
         self.add_page('/xml', body=body, content_type='application/xml')
-        self.crawl([self.app_url + '/xml'])
+        self.crawl([f'{self.app_url}/xml'])
         self.assertStat(0, content_type='application/xml', num_urls=1)
-        self.assertStat(1, url=self.app_url + '/')
+        self.assertStat(1, url=f'{self.app_url}/')
 
         self.add_page('/image', content_type='image')
-        self.crawl([self.app_url + '/image'])
+        self.crawl([f'{self.app_url}/image'])
         self.assertStat(content_type='image', num_urls=0)
 
     def test_non_http(self):

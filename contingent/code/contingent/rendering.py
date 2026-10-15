@@ -10,8 +10,8 @@ def as_graphviz(graph):
 
     """
     edges = graph.edges()
-    inputs = set(input for input, consequence in edges)
-    consequences = set(consequence for input, consequence in edges)
+    inputs = {input for input, consequence in edges}
+    consequences = {consequence for input, consequence in edges}
     lines = ['digraph {', 'graph [rankdir=LR];']
     append = lines.append
 

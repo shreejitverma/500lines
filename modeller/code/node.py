@@ -58,15 +58,11 @@ class Node(object):
 
         # transform the modelview matrix by the current translation
         newmat = numpy.dot(numpy.dot(mat, self.translation_matrix), numpy.linalg.inv(self.scaling_matrix))
-        results = self.aabb.ray_hit(start, direction, newmat)
-        return results
+        return self.aabb.ray_hit(start, direction, newmat)
 
     def select(self, select=None):
         """ Toggles or sets selected state """
-        if select is not None:
-            self.selected = select
-        else:
-            self.selected = not self.selected
+        self.selected = select if select is not None else not self.selected
 
 class Primitive(Node):
     def __init__(self):

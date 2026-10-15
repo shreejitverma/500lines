@@ -213,7 +213,7 @@ class Trackball(object):
         gl.glTranslate (self._x, self._y, -self._distance)
         gl.glMultMatrixf (self._matrix)
 
-    def pop(void):
+    def pop(self):
         gl.glMatrixMode(gl.GL_MODELVIEW)
         gl.glPopMatrix()
         gl.glMatrixMode(gl.GL_PROJECTION)
@@ -228,8 +228,8 @@ class Trackball(object):
         return self._zoom
     def _set_zoom(self, zoom):
         self._zoom = zoom
-        if self._zoom < .25: self._zoom = .25
-        if self._zoom > 10: self._zoom = 10
+        self._zoom = max(self._zoom, .25)
+        self._zoom = min(self._zoom, 10)
     zoom = property(_get_zoom, _set_zoom,
                      doc='''Zoom factor''')
 
@@ -237,7 +237,7 @@ class Trackball(object):
         return self._distance
     def _set_distance(self, distance):
         self._distance = distance
-        if self._distance < 1: self._distance= 1
+        self._distance = max(self._distance, 1)
     distance = property(_get_distance, _set_distance,
                         doc='''Scene distance from point of view''')
 
@@ -291,15 +291,13 @@ class Trackball(object):
         '''
 
         d = math.sqrt(x*x + y*y)
-        if (d < r * 0.70710678118654752440):    # Inside sphere
-            z = math.sqrt(r*r - d*d)
-        else:                                   # On hyperbola
-            t = r / 1.41421356237309504880
-            z = t*t / d
-        return z
+        if (d < r * 0.70710678118654752440):
+            return math.sqrt(r*r - d*d)
+        t = r / 1.41421356237309504880
+        return t*t / d
 
 
-    def _rotate(self, x, y, dx, dy): 
+    def _rotate(self, x, y, dx, dy):
         ''' Simulate a track-ball.
 
             Project the points onto the virtual trackball, then figure out the
@@ -318,8 +316,8 @@ class Trackball(object):
         a = _v_cross(new, last)
         d = _v_sub(last, new)
         t = _v_length(d) / (2.0*self._TRACKBALLSIZE)
-        if (t > 1.0): t = 1.0
-        if (t < -1.0): t = -1.0
+        t = min(t, 1.0)
+        t = max(t, -1.0)
         phi = 2.0 * math.asin(t)
         return _q_from_axis_angle(a,phi)
 
@@ -328,11 +326,11 @@ class Trackball(object):
         phi = str(self.phi)
         theta = str(self.theta)
         zoom = str(self.zoom)
-        return 'Trackball(phi=%s,theta=%s,zoom=%s)' % (phi,theta,zoom)
+        return f'Trackball(phi={phi},theta={theta},zoom={zoom})'
 
     def __repr__(self):
         phi = str(self.phi)
         theta = str(self.theta)
         zoom = str(self.zoom)
-        return 'Trackball(phi=%s,theta=%s,zoom=%s)' % (phi,theta,zoom)
+        return f'Trackball(phi={phi},theta={theta},zoom={zoom})'
 

@@ -31,12 +31,11 @@ class Storage(object):
         self.unlock()
 
     def lock(self):
-        if not self.locked:
-            portalocker.lock(self._f, portalocker.LOCK_EX)
-            self.locked = True
-            return True
-        else:
+        if self.locked:
             return False
+        portalocker.lock(self._f, portalocker.LOCK_EX)
+        self.locked = True
+        return True
 
     def unlock(self):
         if self.locked:
@@ -74,8 +73,7 @@ class Storage(object):
     def read(self, address):
         self._f.seek(address)
         length = self._read_integer()
-        data = self._f.read(length)
-        return data
+        return self._f.read(length)
 
     def commit_root_address(self, root_address):
         self.lock()
@@ -87,8 +85,7 @@ class Storage(object):
 
     def get_root_address(self):
         self._seek_superblock()
-        root_address = self._read_integer()
-        return root_address
+        return self._read_integer()
 
     def close(self):
         self.unlock()

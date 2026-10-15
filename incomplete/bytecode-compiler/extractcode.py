@@ -2,6 +2,7 @@
 Take Markdown and extract the code sections.
 """
 
+
 import sys
 
 outputs = {}
@@ -33,4 +34,4 @@ for label in parts:
 with open('non-compiler', 'w') as f:
     for label, lines in outputs.items():
         for line in lines:
-            f.write(label+': '+line+'\n')
+            f.write(f'{label}: {line}' + '\n')

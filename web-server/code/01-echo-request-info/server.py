@@ -36,8 +36,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             'command'     : self.command,
             'path'        : self.path
         }
-        page = self.Page.format(**values)
-        return page
+        return self.Page.format(**values)
 
     # Send the created page.
     def send_page(self, page):

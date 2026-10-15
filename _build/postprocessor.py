@@ -66,10 +66,7 @@ if __name__ == '__main__':
     parser.add_argument('--output', dest='output', required=True)
     args = parser.parse_args()
     destination_file = open(args.output, 'w')
-    if len(args.doc) > 0:
-        input_file = open(args.doc[0])
-    else:
-        input_file = sys.stdin
+    input_file = open(args.doc[0]) if len(args.doc) > 0 else sys.stdin
     input_document = input_file.read()
     input_document = fix_latex_macros(input_document)
     out = input_document

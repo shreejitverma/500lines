@@ -21,7 +21,7 @@ class SimpleInterpreter(object):
 
     def STORE_NAME(self, name):
         val = self.stack.pop()
-        print("storing name %s: %s" % (name, val))
+        print(f"storing name {name}: {val}")
         self.environment[name] = val
 
     def LOAD_NAME(self, name):
@@ -45,9 +45,6 @@ class SimpleInterpreter(object):
             argument = what_to_execute["numbers"][argument]
         elif instruction in argument_meaning["names"]:
             argument = what_to_execute["names"][argument]
-        elif instruction in argument_meaning["jumps"]:
-            pass
-
         return argument
 
 

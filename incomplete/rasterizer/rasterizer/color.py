@@ -23,7 +23,7 @@ class Color:
                            byte(self.rgb[1] * self.a),
                            byte(self.rgb[2] * self.a))
     def __repr__(self):
-        return "[" + str(self.rgb) + "," + str(self.a) + "]"
+        return f"[{str(self.rgb)},{str(self.a)}]"
     @staticmethod
     def hex(code, a=1):
         if len(code) == 4:

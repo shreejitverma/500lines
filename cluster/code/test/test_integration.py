@@ -53,11 +53,13 @@ class Tests(unittest.TestCase):
         nodes = self.setupNetwork(5)
         # set up some timers for various events
         def request_done(output):
-            self.event("request done: %s" % output)
+            self.event(f"request done: {output}")
+
         def make_request(n, node):
-            self.event("request: %s" % n)
+            self.event(f"request: {n}")
             req = Requester(node, n, request_done)
             req.start()
+
         for time, callback in [
                 (1.0, lambda: make_request(5, nodes[1])),
                 (5.0, lambda: make_request(6, nodes[2])),

@@ -40,7 +40,7 @@ class FakeNode(Node):
         super(FakeNode, self).__init__(network, 'F999')
         self.unique_id = 999
         self.sent = []
-        self.logger = logging.getLogger('node.%s' % (self.address,))
+        self.logger = logging.getLogger(f'node.{self.address}')
 
     def register(self, role):
         assert role not in self.roles
@@ -52,5 +52,5 @@ class FakeNode(Node):
 
     def fake_message(self, message, sender='F999'):
         for role in self.roles:
-            fn = getattr(role, 'do_%s' % type(message).__name__)
+            fn = getattr(role, f'do_{type(message).__name__}')
             fn(sender=sender, **message._asdict())

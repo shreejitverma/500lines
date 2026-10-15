@@ -57,7 +57,7 @@ class Node(object):
         self.roles.remove(roles)
 
     def receive(self, sender, message):
-        handler_name = 'do_%s' % type(message).__name__
+        handler_name = f'do_{type(message).__name__}'
 
         for comp in self.roles[:]:
             if not hasattr(comp, handler_name):
@@ -352,7 +352,10 @@ class Scout(Role):
             if len(self.acceptors) >= self.quorum:
                 # strip the ballot numbers from self.accepted_proposals, now that it
                 # represents a majority
-                accepted_proposals = dict((s, p) for s, (b, p) in self.accepted_proposals.iteritems())
+                accepted_proposals = {
+                    s: p for s, (b, p) in self.accepted_proposals.iteritems()
+                }
+
                 # We're adopted; note that this does *not* mean that no other leader is active.
                 # Any such conflicts will be handled by the commanders.
                 self.node.send([self.node.address],
@@ -408,19 +411,18 @@ class Leader(Role):
         self.ballot_num = Ballot((preempted_by or self.ballot_num).n + 1, self.ballot_num.leader)
 
     def do_Propose(self, sender, slot, proposal):
-        if slot not in self.proposals:
-            if self.active:
-                self.proposals[slot] = proposal
-                self.logger.info("spawning commander for slot %d" % (slot,))
-                self.spawn_commander(self.ballot_num, slot)
-            else:
-                if not self.scouting:
-                    self.logger.info("got PROPOSE when not active - scouting")
-                    self.spawn_scout()
-                else:
-                    self.logger.info("got PROPOSE while scouting; ignored")
-        else:
+        if slot in self.proposals:
             self.logger.info("got PROPOSE for a slot already being proposed")
+
+        elif self.active:
+            self.proposals[slot] = proposal
+            self.logger.info("spawning commander for slot %d" % (slot,))
+            self.spawn_commander(self.ballot_num, slot)
+        elif self.scouting:
+            self.logger.info("got PROPOSE while scouting; ignored")
+        else:
+            self.logger.info("got PROPOSE when not active - scouting")
+            self.spawn_scout()
 
 class Bootstrap(Role):
 

@@ -55,7 +55,7 @@ def initialize_strategies():
 
     # Combine every neighbourhood and heuristic strategy
     for (n, h) in product(neighbourhoods, heuristics):
-        STRATEGIES.append(Strategy("%s / %s" % (n[0], h[0]), n[1], h[1]))
+        STRATEGIES.append(Strategy(f"{n[0]} / {h[0]}", n[1], h[1]))
 
 
 
@@ -211,7 +211,7 @@ def pick_strategy(strategies, weights):
     #  Rather than selecting a strategy entirely at random, we bias the
     #  random selection towards strategies that have worked well in the
     #  past (according to the weight value).
-    total = sum([weights[strategy] for strategy in strategies])
+    total = sum(weights[strategy] for strategy in strategies)
     pick = random.uniform(0, total)
     count = weights[strategies[0]]
 

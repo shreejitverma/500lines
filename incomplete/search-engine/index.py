@@ -20,8 +20,10 @@ def read_tuples(infile):
 # XXX maybe these functions don't need to exist?
 def read_metadata(index_path):
     with path['documents'].open() as metadata_file:
-        return dict((pathname, (int(mtime), int(size)))
-                    for pathname, size, mtime in read_tuples(metadata_file))
+        return {
+            pathname: (int(mtime), int(size))
+            for pathname, size, mtime in read_tuples(metadata_file)
+        }
 
 # XXX we probably want files_unchanged
 def file_unchanged(metadatas, path):
@@ -63,9 +65,8 @@ def segment_term_doc_ids(segment, needle_term):
 def segment_term_chunks(segment, term):
     previous_chunk = None
     for headword, chunk in skip_file_entries(segment):
-        if headword >= term:
-            if previous_chunk is not None:
-                yield previous_chunk
+        if headword >= term and previous_chunk is not None:
+            yield previous_chunk
         if headword > term:
             break
 
@@ -111,22 +112,21 @@ def build_index(index_path, corpus_path, postings_filters):
     # XXX at this point we should just pass the fucking doc_id into
     # the analyzer function :(
     parent = index_path.parent()
-    rel_paths = dict((path.name, os.path.relpath(path.name, start=parent.name))
-                     for path in corpus_paths)
+    rel_paths = {
+        path.name: os.path.relpath(path.name, start=parent.name)
+        for path in corpus_paths
+    }
+
     rel_postings = ((term, rel_paths[doc_id]) for term, doc_id in postings)
     for ii, chunk in enumerate(blocked(rel_postings, segment_size)):
-        write_new_segment(index_path['seg_%s' % ii], sorted(chunk))
+        write_new_segment(index_path[f'seg_{ii}'], sorted(chunk))
 
     merge_segments(index_path, index_segments(index_path))
 # From nikipore on Stack Overflow <http://stackoverflow.com/a/19264525>
 def blocked(seq, block_size):
     seq = iter(seq)
     while True:
-        # XXX for some reason using list(), and then later sorting in
-        # place, makes the whole program run twice as slow and doesn't
-        # reduce its memory usage.  No idea why.
-        block = tuple(itertools.islice(seq, block_size))
-        if block:
+        if block := tuple(itertools.islice(seq, block_size)):
             yield block
         else:
             raise StopIteration
@@ -138,8 +138,7 @@ def find_documents(path):
 
 def tokenize_documents(paths):
     for path in paths:
-        for posting in remove_duplicates(tokenize_file(path)):
-            yield posting
+        yield from remove_duplicates(tokenize_file(path))
 
 # Demonstrate a crude set of smart tokenizer frontends.
 def tokenize_file(file_path):
@@ -165,8 +164,10 @@ chunk_size = 4096
 def write_new_segment(path, postings):
     os.mkdir(path.name)
     chunks = blocked(postings, chunk_size)
-    skip_file_contents = (write_chunk(path, '%s.gz' % ii, chunk)
-                          for ii, chunk in enumerate(chunks))
+    skip_file_contents = (
+        write_chunk(path, f'{ii}.gz', chunk) for ii, chunk in enumerate(chunks)
+    )
+
     with path['skip'].open('w') as skip_file:
         write_tuples(skip_file, itertools.chain(*skip_file_contents))
 
@@ -215,12 +216,13 @@ def read_segment(path):
     for _, chunk in skip_file_entries(path):
         # XXX refactor chunk reading?  We open_gzipped in three places now.
         with path[chunk].open_gzipped() as chunk_file:
-            for item in read_tuples(chunk_file):
-                yield item
+            yield from read_tuples(chunk_file)
 def make_stopwords_filter(stopwords):
     stopwords = set(stopwords)
-    stopwords |= ( set(word.upper()      for word in stopwords) 
-                 | set(word.capitalize() for word in stopwords))
+    stopwords |= {word.upper() for word in stopwords} | {
+        word.capitalize() for word in stopwords
+    }
+
     return lambda postings: ((term, doc_id) for term, doc_id in postings
                              if term not in stopwords)
 word_len = 20                   # to eliminate nonsense words
@@ -238,7 +240,7 @@ def grep(index_path, terms):
             with path.open() as text:
                 for ii, line in enumerate(text, start=1):
                     if any(term in line for term in terms):
-                        sys.stdout.write("%s:%s:%s" % (path.name, ii, line))
+                        sys.stdout.write(f"{path.name}:{ii}:{line}")
         except Exception:          # The file might e.g. no longer exist.
             traceback.print_exc()
 def main(argv):
@@ -257,7 +259,7 @@ def main(argv):
         grep(Path(argv[2]), [term for term in argv[3:]
                              if term not in stopwords])
     else:
-        raise Exception("%s (index|query|grep) index_dir ..." % (argv[0]))
+        raise Exception(f"{argv[0]} (index|query|grep) index_dir ...")
 
 if __name__ == '__main__':
     main(sys.argv)

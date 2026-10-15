@@ -2,6 +2,7 @@
 
 """Sloppy little crawler, demonstrates a hand-made event loop and callbacks."""
 
+
 from selectors import *
 import socket
 import re
@@ -9,8 +10,8 @@ import urllib.parse
 import time
 
 
-urls_todo = set(['/'])
-seen_urls = set(['/'])
+urls_todo = {'/'}
+seen_urls = {'/'}
 concurrency_achieved = 0
 selector = DefaultSelector()
 stopped = False
@@ -36,15 +37,14 @@ class Fetcher:
 
     def connected(self, key, mask):
         selector.unregister(key.fd)
-        get = 'GET {} HTTP/1.0\r\nHost: xkcd.com\r\n\r\n'.format(self.url)
+        get = f'GET {self.url} HTTP/1.0\r\nHost: xkcd.com\r\n\r\n'
         self.sock.send(get.encode('ascii'))
         selector.register(key.fd, EVENT_READ, self.read_response)
 
     def read_response(self, key, mask):
         global stopped
 
-        chunk = self.sock.recv(4096)  # 4k chunk size.
-        if chunk:
+        if chunk := self.sock.recv(4096):
             self.response += chunk
         else:
             selector.unregister(key.fd)  # Done reading.
@@ -65,7 +65,7 @@ class Fetcher:
 
     def parse_links(self):
         if not self.response:
-            print('error: {}'.format(self.url))
+            print(f'error: {self.url}')
             return set()
         if not self._is_html():
             return set()

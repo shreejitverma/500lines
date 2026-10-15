@@ -53,7 +53,7 @@ ARGS.add_argument(
 def fix_url(url):
     """Prefix a schema-less URL with http://."""
     if '://' not in url:
-        url = 'http://' + url
+        url = f'http://{url}'
     return url
 
 

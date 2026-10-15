@@ -48,9 +48,8 @@ class AABB(object):
                 tmin = t1
             if tmax < tmin:
                 return (False, 0)
-        else:
-            if (-e + aabb_min[0] > 0.0 + EPSILON) or (-e+aabb_max[0] < 0.0 - EPSILON):
-                return False, 0
+        elif (-e + aabb_min[0] > 0.0 + EPSILON) or (-e+aabb_max[0] < 0.0 - EPSILON):
+            return False, 0
 
         yaxis = numpy.array((modelmatrix[1, 0], modelmatrix[1, 1], modelmatrix[1, 2]))
         e = numpy.dot(yaxis, delta)
@@ -67,9 +66,8 @@ class AABB(object):
                 tmin = t1
             if tmax < tmin:
                 return (False, 0)
-        else:
-            if (-e + aabb_min[1] > 0.0 + EPSILON) or (-e+aabb_max[1] < 0.0 - EPSILON):
-                return False, 0
+        elif (-e + aabb_min[1] > 0.0 + EPSILON) or (-e+aabb_max[1] < 0.0 - EPSILON):
+            return False, 0
 
         # intersection in z
         zaxis = numpy.array((modelmatrix[2, 0], modelmatrix[2, 1], modelmatrix[2, 2]))
@@ -86,9 +84,8 @@ class AABB(object):
                 tmin = t1
             if tmax < tmin:
                 return (False, 0)
-        else:
-            if (-e + aabb_min[2] > 0.0 + EPSILON) or (-e+aabb_max[2] < 0.0 - EPSILON):
-                return False, 0
+        elif (-e + aabb_min[2] > 0.0 + EPSILON) or (-e+aabb_max[2] < 0.0 - EPSILON):
+            return False, 0
 
         return True, tmin
 

@@ -26,10 +26,7 @@ class VirtualMachine(object):
 
     def pop_frame(self):
         self.frames.pop()
-        if self.frames:
-            self.frame = self.frames[-1]
-        else:
-            self.frame = None
+        self.frame = self.frames[-1] if self.frames else None
 
     # Data stack manipulation
     def top(self):
@@ -62,11 +59,7 @@ class VirtualMachine(object):
 
     def unwind_block(self, block):
         """Unwind the values on the data stack corresponding to a given block."""
-        if block.type == 'except-handler':
-            offset = 3
-        else:
-            offset = 0
-
+        offset = 3 if block.type == 'except-handler' else 0
         while len(self.frame.stack) > block.level + offset:
             self.pop()
 
@@ -82,14 +75,7 @@ class VirtualMachine(object):
     def run_code(self, code, f_globals=None, f_locals=None):
         """ An entry point to execute code using the virtual machine."""
         frame = self.make_frame(code, f_globals=f_globals, f_locals=f_locals)
-        val = self.run_frame(frame)
-        # Check some invariants
-        # if self.frames:
-        #     raise VirtualMachineError("Frames left over!")
-        # if self.frame and self.frame.stack:
-        #     raise VirtualMachineError("Data left on stack! %r" % self.frame.stack)
-
-        return val # for testing - will be removed
+        return self.run_frame(frame)
 
     def parse_byte_and_args(self):
         f = self.frame
@@ -129,14 +115,10 @@ class VirtualMachine(object):
                 self.unaryOperator(byteName[6:])
             elif byteName.startswith('BINARY_'):
                 self.binaryOperator(byteName[7:])
-            else:
-                # main dispatch
-                bytecode_fn = getattr(self, 'byte_%s' % byteName, None)
-                if not bytecode_fn:            # pragma: no cover
-                    raise VirtualMachineError(
-                        "unsupported bytecode type: %s" % byteName
-                    )
+            elif bytecode_fn := getattr(self, f'byte_{byteName}', None):
                 why = bytecode_fn(*arguments)
+            else:
+                raise VirtualMachineError(f"unsupported bytecode type: {byteName}")
         except:
             # deal with exceptions encountered while executing the op.
             self.last_exception = sys.exc_info()[:2] + (None,)
